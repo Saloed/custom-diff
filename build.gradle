@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'com.github.saloed'
-version '0.0.2'
+version '0.0.4'
 
 def githubProperties = new Properties()
 githubProperties.load(new FileInputStream(rootProject.file("github.properties")))
@@ -32,6 +32,8 @@ publishing {
 
 java {
     withSourcesJar()
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 repositories {
@@ -55,4 +57,12 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }
