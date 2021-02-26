@@ -1,0 +1,26 @@
+plugins {
+    id 'maven'
+    id 'org.jetbrains.kotlin.jvm' version '1.4.30'
+}
+
+group 'com.github.saloed'
+version '0.0.1'
+
+def githubProperties = new Properties()
+githubProperties.load(new FileInputStream(rootProject.file("github.properties")))
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://maven.pkg.github.com/saloed/diff-match-patch"
+        credentials {
+            username = githubProperties.get("gpr.user")
+            password = githubProperties.get("gpr.key")
+        }
+    }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation "name.fraser.neil.plaintext:diff_match_patch:master"
+}
