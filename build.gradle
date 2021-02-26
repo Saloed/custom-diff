@@ -1,14 +1,38 @@
 plugins {
     id 'maven'
+    id 'maven-publish'
     id 'org.jetbrains.kotlin.jvm' version '1.4.30'
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.4.30'
+    id 'java-library'
 }
 
 group 'com.github.saloed'
-version '0.0.1'
+version '0.0.2'
 
 def githubProperties = new Properties()
 githubProperties.load(new FileInputStream(rootProject.file("github.properties")))
+
+
+publishing {
+    repositories {
+        maven {
+            url "https://maven.pkg.github.com/saloed/custom-diff"
+            credentials {
+                username = githubProperties.get("gpr.user")
+                password = githubProperties.get("gpr.key")
+            }
+        }
+    }
+    publications {
+        gpr(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
+
+java {
+    withSourcesJar()
+}
 
 repositories {
     mavenCentral()
