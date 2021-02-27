@@ -2,16 +2,20 @@ package com.github.saloed.diff
 
 import name.fraser.neil.plaintext.DiffMatchPatch
 import name.fraser.neil.plaintext.diff_match_patch
-import java.nio.file.Path
 
-fun twoWayDiffFromDMPDiff(diffs: List<diff_match_patch.Diff>, leftName: String, rightName: String): TwoWayDiff {
+fun twoWayDiffFromDMPDiff(
+    diffs: List<diff_match_patch.Diff>,
+    leftName: String,
+    rightName: String,
+    mode: DiffMode
+): TwoWayDiff {
     val dmp = DiffMatchPatch()
-    val offsetDiffs = makeOffsetDiff(diffs)
+    val offsetDiffs = makeOffsetDiff(diffs, mode)
     val leftContentLines = dmp.diff_text1(diffs).lines()
     val rightContentLines = dmp.diff_text2(diffs).lines()
     val leftFile = DiffFile(leftName, leftContentLines)
     val rightFile = DiffFile(rightName, rightContentLines)
-    return TwoWayDiff(leftFile, rightFile, offsetDiffs)
+    return TwoWayDiff(leftFile, rightFile, offsetDiffs, mode)
 }
 
 private fun DiffRange.nextOffset(lines: List<String>) = when (lines.size) {
@@ -22,7 +26,7 @@ private fun DiffRange.nextOffset(lines: List<String>) = when (lines.size) {
 
 private fun DiffRange.emptyOffset() = DiffRange(endLine, endLineOffset, endLine, endLineOffset)
 
-private fun makeOffsetDiff(diffs: List<diff_match_patch.Diff>): List<Diff> {
+private fun makeOffsetDiff(diffs: List<diff_match_patch.Diff>, mode: DiffMode): List<Diff> {
     val result = mutableListOf<Diff>()
     var currentLeftOffset = DiffRange(0, 0, 0, 0)
     var currentRightOffset = DiffRange(0, 0, 0, 0)
@@ -44,6 +48,7 @@ private fun makeOffsetDiff(diffs: List<diff_match_patch.Diff>): List<Diff> {
                 currentLeftOffset = currentLeftOffset.emptyOffset()
             }
         }
+        check(currentLeftOffset.isCorrectInMode(mode) && currentRightOffset.isCorrectInMode(mode)) { "Incorrect range" }
         result += Diff(type, currentLeftOffset, currentRightOffset)
     }
     return result

@@ -8,4 +8,6 @@ enum class DiffType {
 }
 
 @Serializable
-data class Diff(val type: DiffType, val left: DiffRange, val right: DiffRange)
+data class Diff(val type: DiffType, val left: DiffRange, val right: DiffRange) {
+    fun isCorrectInMode(mode: DiffMode) = left.isCorrectInMode(mode) && right.isCorrectInMode(mode)
+}
